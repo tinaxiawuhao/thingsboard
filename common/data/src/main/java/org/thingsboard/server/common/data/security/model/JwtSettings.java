@@ -30,26 +30,26 @@ public class JwtSettings {
     /**
      * {@link JwtToken} will expire after this time.
      */
-    @ApiModelProperty(position = 1, value = "The JWT will expire after seconds.", example = "9000")
+    @ApiModelProperty(position = 1, value = "JWT将在多少秒后过期.", example = "9000")
     private Integer tokenExpirationTime;
 
     /**
      * {@link JwtToken} can be refreshed during this timeframe.
      */
-    @ApiModelProperty(position = 2, value = "The JWT can be refreshed during seconds.", example = "604800")
+    @ApiModelProperty(position = 2, value = "JWT可以在多少秒内刷新.", example = "604800")
     private Integer refreshTokenExpTime;
 
     /**
      * Token issuer.
      */
-    @ApiModelProperty(position = 3, value = "The JWT issuer.", example = "thingsboard.io")
+    @ApiModelProperty(position = 3, value = "JWT发行人.", example = "thingsboard.io")
     private String tokenIssuer;
 
     /**
      * Key is used to sign {@link JwtToken}.
      * Base64 encoded
      */
-    @ApiModelProperty(position = 4, value = "The JWT key is used to sing token. Base64 encoded.", example = "cTU4WnNqemI2aU5wbWVjdm1vYXRzanhjNHRUcXliMjE=")
+    @ApiModelProperty(position = 4, value = "JWT密钥用于通知令牌。Base64编码.", example = "cTU4WnNqemI2aU5wbWVjdm1vYXRzanhjNHRUcXliMjE=")
     private String tokenSigningKey;
 
 }

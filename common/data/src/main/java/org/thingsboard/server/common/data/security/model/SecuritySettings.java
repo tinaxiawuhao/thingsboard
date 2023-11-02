@@ -27,10 +27,10 @@ public class SecuritySettings implements Serializable {
 
     private static final long serialVersionUID = -1307613974597312465L;
 
-    @ApiModelProperty(position = 1, value = "The user password policy object." )
+    @ApiModelProperty(position = 1, value = "用户密码策略对象." )
     private UserPasswordPolicy passwordPolicy;
-    @ApiModelProperty(position = 2, value = "Maximum number of failed login attempts allowed before user account is locked." )
+    @ApiModelProperty(position = 2, value = "锁定用户帐户之前允许的最大登录失败次数." )
     private Integer maxFailedLoginAttempts;
-    @ApiModelProperty(position = 3, value = "Email to use for notifications about locked users." )
+    @ApiModelProperty(position = 3, value = "用于通知锁定用户的电子邮件." )
     private String userLockoutNotificationEmail;
 }

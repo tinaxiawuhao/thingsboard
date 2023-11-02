@@ -123,13 +123,13 @@ public class AdminController extends BaseController {
     private final SystemInfoService systemInfoService;
     private final AuditLogService auditLogService;
 
-    @ApiOperation(value = "Get the Administration Settings object using key (getAdminSettings)",
-            notes = "Get the Administration Settings object using specified string key. Referencing non-existing key will cause an error." + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "使用键获取Administration Settings对象（getAdminSettings）",
+            notes = "使用指定的字符串键获取Administration Settings对象。引用不存在的密钥将导致错误." + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
     @ResponseBody
     public AdminSettings getAdminSettings(
-            @ApiParam(value = "A string value of the key (e.g. 'general' or 'mail').")
+            @ApiParam(value = "密钥的字符串值（例如“general”或“mail”）.")
             @PathVariable("key") String key) throws ThingsboardException {
         accessControlService.checkPermission(getCurrentUser(), Resource.ADMIN_SETTINGS, Operation.READ);
         AdminSettings adminSettings = checkNotNull(adminSettingsService.findAdminSettingsByKey(TenantId.SYS_TENANT_ID, key), "No Administration settings found for key: " + key);
@@ -140,10 +140,10 @@ public class AdminController extends BaseController {
         return adminSettings;
     }
 
-    @ApiOperation(value = "Get the Administration Settings object using key (getAdminSettings)",
-            notes = "Creates or Updates the Administration Settings. Platform generates random Administration Settings Id during settings creation. " +
-                    "The Administration Settings Id will be present in the response. Specify the Administration Settings Id when you would like to update the Administration Settings. " +
-                    "Referencing non-existing Administration Settings Id will cause an error." + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "使用键创建或更新Administration Settings对象（saveAdminSettings）",
+            notes = "创建或更新管理设置。平台在创建设置期间生成随机管理设置Id。" +
+                    "管理设置Id将出现在响应中。要更新管理设置时，请指定管理设置Id。" +
+                    "引用不存在的管理设置Id将导致错误." + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/settings", method = RequestMethod.POST)
     @ResponseBody
@@ -163,8 +163,8 @@ public class AdminController extends BaseController {
         return adminSettings;
     }
 
-    @ApiOperation(value = "Get the Security Settings object",
-            notes = "Get the Security Settings object that contains password policy, etc." + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "获取安全设置对象（getSecuritySettings）",
+            notes = "获取包含密码策略等的Security Settings对象." + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/securitySettings", method = RequestMethod.GET)
     @ResponseBody
@@ -173,21 +173,21 @@ public class AdminController extends BaseController {
         return checkNotNull(systemSecurityService.getSecuritySettings(TenantId.SYS_TENANT_ID));
     }
 
-    @ApiOperation(value = "Update Security Settings (saveSecuritySettings)",
-            notes = "Updates the Security Settings object that contains password policy, etc." + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "更新安全设置（saveSecuritySettings）",
+            notes = "更新包含密码策略等的安全设置对象." + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/securitySettings", method = RequestMethod.POST)
     @ResponseBody
     public SecuritySettings saveSecuritySettings(
-            @ApiParam(value = "A JSON value representing the Security Settings.")
+            @ApiParam(value = "表示安全设置的JSON值.")
             @RequestBody SecuritySettings securitySettings) throws ThingsboardException {
         accessControlService.checkPermission(getCurrentUser(), Resource.ADMIN_SETTINGS, Operation.WRITE);
         securitySettings = checkNotNull(systemSecurityService.saveSecuritySettings(TenantId.SYS_TENANT_ID, securitySettings));
         return securitySettings;
     }
 
-    @ApiOperation(value = "Get the JWT Settings object (getJwtSettings)",
-            notes = "Get the JWT Settings object that contains JWT token policy, etc. " + SYSTEM_AUTHORITY_PARAGRAPH,
+    @ApiOperation(value = "获取JWT设置对象（getJwtSettings）",
+            notes = "获取包含JWT令牌策略等的JWT Settings对象. " + SYSTEM_AUTHORITY_PARAGRAPH,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/jwtSettings", method = RequestMethod.GET)
@@ -197,8 +197,8 @@ public class AdminController extends BaseController {
         return checkNotNull(jwtSettingsService.getJwtSettings());
     }
 
-    @ApiOperation(value = "Update JWT Settings (saveJwtSettings)",
-            notes = "Updates the JWT Settings object that contains JWT token policy, etc. The tokenSigningKey field is a Base64 encoded string." + SYSTEM_AUTHORITY_PARAGRAPH,
+    @ApiOperation(value = "更新JWT设置（saveJwtSettings）",
+            notes = "更新包含JWT令牌策略等的JWT Settings对象。tokenSigningKey字段是Base64编码的字符串." + SYSTEM_AUTHORITY_PARAGRAPH,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/jwtSettings", method = RequestMethod.POST)
@@ -212,9 +212,9 @@ public class AdminController extends BaseController {
         return tokenFactory.createTokenPair(securityUser);
     }
 
-    @ApiOperation(value = "Send test email (sendTestMail)",
-            notes = "Attempts to send test email to the System Administrator User using Mail Settings provided as a parameter. " +
-                    "You may change the 'To' email in the user profile of the System Administrator. " + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "发送测试电子邮件（sendTestMail）",
+            notes = "尝试使用作为参数提供的“邮件设置”向系统管理员用户发送测试电子邮件. " +
+                    "您可以在系统管理员的用户配置文件中更改“收件人”电子邮件. " + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/settings/testMail", method = RequestMethod.POST)
     public void sendTestMail(
@@ -243,8 +243,8 @@ public class AdminController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "Send test sms (sendTestMail)",
-            notes = "Attempts to send test sms to the System Administrator User using SMS Settings and phone number provided as a parameters of the request. "
+    @ApiOperation(value = "发送测试短信（sendTestMail）",
+            notes = "尝试使用提供的短信设置和电话号码作为请求参数向系统管理员用户发送测试短信. "
                     + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/settings/testSms", method = RequestMethod.POST)
@@ -262,8 +262,8 @@ public class AdminController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "Get repository settings (getRepositorySettings)",
-            notes = "Get the repository settings object. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "获取存储库设置（getRepositorySettings）",
+            notes = "获取存储库设置对象. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping("/repositorySettings")
     public RepositorySettings getRepositorySettings() throws ThingsboardException {
@@ -275,8 +275,8 @@ public class AdminController extends BaseController {
         return versionControlSettings;
     }
 
-    @ApiOperation(value = "Check repository settings exists (repositorySettingsExists)",
-            notes = "Check whether the repository settings exists. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "检查存储库设置是否存在（repositorySettingsExists）",
+            notes = "检查存储库设置是否存在. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping("/repositorySettings/exists")
     public Boolean repositorySettingsExists() throws ThingsboardException {
@@ -284,6 +284,8 @@ public class AdminController extends BaseController {
         return versionControlService.getVersionControlSettings(getTenantId()) != null;
     }
 
+    @ApiOperation(value = "获取存储库信息（getRepositorySettingsInfo）",
+            notes = "获取存储库信息. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping("/repositorySettings/info")
     public RepositorySettingsInfo getRepositorySettingsInfo() throws Exception {
@@ -301,8 +303,8 @@ public class AdminController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "Creates or Updates the repository settings (saveRepositorySettings)",
-            notes = "Creates or Updates the repository settings object. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "创建或更新存储库设置 (saveRepositorySettings)",
+            notes = "创建或更新存储库设置对象. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping("/repositorySettings")
     public DeferredResult<RepositorySettings> saveRepositorySettings(@RequestBody RepositorySettings settings) throws ThingsboardException {
@@ -316,8 +318,8 @@ public class AdminController extends BaseController {
         }, MoreExecutors.directExecutor()));
     }
 
-    @ApiOperation(value = "Delete repository settings (deleteRepositorySettings)",
-            notes = "Deletes the repository settings."
+    @ApiOperation(value = "删除存储库设置 (deleteRepositorySettings)",
+            notes = "删除存储库设置."
                     + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/repositorySettings", method = RequestMethod.DELETE)
@@ -327,8 +329,8 @@ public class AdminController extends BaseController {
         return wrapFuture(versionControlService.deleteVersionControlSettings(getTenantId()));
     }
 
-    @ApiOperation(value = "Check repository access (checkRepositoryAccess)",
-            notes = "Attempts to check repository access. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "检查存储库访问 (checkRepositoryAccess)",
+            notes = "尝试检查存储库访问. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/repositorySettings/checkAccess", method = RequestMethod.POST)
     public DeferredResult<Void> checkRepositoryAccess(
@@ -339,8 +341,8 @@ public class AdminController extends BaseController {
         return wrapFuture(versionControlService.checkVersionControlAccess(getTenantId(), settings));
     }
 
-    @ApiOperation(value = "Get auto commit settings (getAutoCommitSettings)",
-            notes = "Get the auto commit settings object. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "获取自动提交设置 (getAutoCommitSettings)",
+            notes = "获取自动提交设置对象. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping("/autoCommitSettings")
     public AutoCommitSettings getAutoCommitSettings() throws ThingsboardException {
@@ -348,8 +350,8 @@ public class AdminController extends BaseController {
         return checkNotNull(autoCommitSettingsService.get(getTenantId()));
     }
 
-    @ApiOperation(value = "Check auto commit settings exists (autoCommitSettingsExists)",
-            notes = "Check whether the auto commit settings exists. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "检查是否存在自动提交设置 (autoCommitSettingsExists)",
+            notes = "检查自动提交设置是否存在. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping("/autoCommitSettings/exists")
     public Boolean autoCommitSettingsExists() throws ThingsboardException {
@@ -357,8 +359,8 @@ public class AdminController extends BaseController {
         return autoCommitSettingsService.get(getTenantId()) != null;
     }
 
-    @ApiOperation(value = "Creates or Updates the auto commit settings (saveAutoCommitSettings)",
-            notes = "Creates or Updates the auto commit settings object. " + TENANT_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "创建或更新自动提交设置 (saveAutoCommitSettings)",
+            notes = "创建或更新自动提交设置对象. " + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping("/autoCommitSettings")
     public AutoCommitSettings saveAutoCommitSettings(@RequestBody AutoCommitSettings settings) throws ThingsboardException {
@@ -367,8 +369,8 @@ public class AdminController extends BaseController {
         return autoCommitSettingsService.save(getTenantId(), settings);
     }
 
-    @ApiOperation(value = "Delete auto commit settings (deleteAutoCommitSettings)",
-            notes = "Deletes the auto commit settings."
+    @ApiOperation(value = "删除自动提交设置 (deleteAutoCommitSettings)",
+            notes = "删除自动提交设置."
                     + TENANT_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/autoCommitSettings", method = RequestMethod.DELETE)
@@ -378,8 +380,8 @@ public class AdminController extends BaseController {
         autoCommitSettingsService.delete(getTenantId());
     }
 
-    @ApiOperation(value = "Check for new Platform Releases (checkUpdates)",
-            notes = "Check notifications about new platform releases. "
+    @ApiOperation(value = "检查新的平台版本 (checkUpdates)",
+            notes = "检查有关新平台发布的通知. "
                     + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/updates", method = RequestMethod.GET)
@@ -388,8 +390,8 @@ public class AdminController extends BaseController {
         return updateService.checkUpdates();
     }
 
-    @ApiOperation(value = "Get system info (getSystemInfo)",
-            notes = "Get main information about system. "
+    @ApiOperation(value = "获取系统信息(getSystemInfo)",
+            notes = "获取有关系统的主要信息. "
                     + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/systemInfo", method = RequestMethod.GET)
@@ -398,8 +400,8 @@ public class AdminController extends BaseController {
         return systemInfoService.getSystemInfo();
     }
 
-    @ApiOperation(value = "Get features info (getFeaturesInfo)",
-            notes = "Get information about enabled/disabled features. "
+    @ApiOperation(value = "获取功能信息 (getFeaturesInfo)",
+            notes = "获取有关启用/禁用功能的信息. "
                     + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/featuresInfo", method = RequestMethod.GET)
@@ -408,9 +410,8 @@ public class AdminController extends BaseController {
         return systemInfoService.getFeaturesInfo();
     }
 
-    @ApiOperation(value = "Get OAuth2 log in processing URL (getMailProcessingUrl)", notes = "Returns the URL enclosed in " +
-            "double quotes. After successful authentication with OAuth2 provider and user consent for requested scope, it makes a redirect to this path so that the platform can do " +
-            "further log in processing and generating access tokens. " + SYSTEM_AUTHORITY_PARAGRAPH)
+    @ApiOperation(value = "获取OAuth2登录处理URL (getMailProcessingUrl)", notes = "返回用双引号括起来的URL。在与OAuth2提供者成功进行身份验证并获得用户对请求范围的同意后，" +
+            "它会重定向到此路径，以便平台可以进行进一步的登录处理并生成访问令牌. " + SYSTEM_AUTHORITY_PARAGRAPH)
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/mail/oauth2/loginProcessingUrl", method = RequestMethod.GET)
     @ResponseBody
@@ -419,8 +420,7 @@ public class AdminController extends BaseController {
          return "\"/api/admin/mail/oauth2/code\"";
     }
 
-    @ApiOperation(value = "Redirect user to mail provider login page. ", notes = "After user logged in and provided access" +
-            "provider sends authorization code to specified redirect uri.)" )
+    @ApiOperation(value = "将用户重定向到邮件提供商登录页. ", notes = "用户登录并提供访问后，提供程序将授权代码发送到指定的重定向uri.)" )
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/mail/oauth2/authorize", method = RequestMethod.GET, produces = "application/text")
     public String getAuthorizationUrl(HttpServletRequest request, HttpServletResponse response) throws ThingsboardException {

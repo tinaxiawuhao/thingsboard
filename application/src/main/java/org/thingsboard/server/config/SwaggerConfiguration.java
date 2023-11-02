@@ -137,6 +137,7 @@ public class SwaggerConfiguration {
                 //头标签
                 .name("X-Authorization")
                 .description("登录token")
+                .defaultValue("Bearer ")
                 .modelRef(new ModelRef("string"))
                 .required(false)
                 ;

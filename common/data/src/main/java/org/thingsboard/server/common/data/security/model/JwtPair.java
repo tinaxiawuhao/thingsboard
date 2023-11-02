@@ -26,9 +26,9 @@ import org.thingsboard.server.common.data.security.Authority;
 @NoArgsConstructor
 public class JwtPair {
 
-    @ApiModelProperty(position = 1, value = "The JWT Access Token. Used to perform API calls.", example = "AAB254FF67D..")
+    @ApiModelProperty(position = 1, value = "JWT访问令牌。用于执行API调用.", example = "AAB254FF67D..")
     private String token;
-    @ApiModelProperty(position = 1, value = "The JWT Refresh Token. Used to get new JWT Access Token if old one has expired.", example = "AAB254FF67D..")
+    @ApiModelProperty(position = 1, value = "JWT刷新令牌。用于在旧的JWT访问令牌过期时获取新的JWT接入令牌.", example = "AAB254FF67D..")
     private String refreshToken;
 
     private Authority scope;

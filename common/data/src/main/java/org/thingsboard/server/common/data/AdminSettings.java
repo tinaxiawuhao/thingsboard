@@ -50,19 +50,19 @@ public class AdminSettings extends BaseData<AdminSettingsId> implements HasTenan
         this.jsonValue = adminSettings.getJsonValue();
     }
 
-    @ApiModelProperty(position = 1, value = "The Id of the Administration Settings, auto-generated, UUID")
+    @ApiModelProperty(position = 1, value = "管理设置的Id,自动生成, UUID")
     @Override
     public AdminSettingsId getId() {
         return super.getId();
     }
 
-    @ApiModelProperty(position = 2, value = "Timestamp of the settings creation, in milliseconds", example = "1609459200000", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(position = 2, value = "设置创建的时间戳，以毫秒为单位", example = "1609459200000", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     @Override
     public long getCreatedTime() {
         return super.getCreatedTime();
     }
 
-    @ApiModelProperty(position = 3, value = "JSON object with Tenant Id.", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(position = 3, value = "带有租户Id的JSON对象.", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     public TenantId getTenantId() {
         return tenantId;
     }
@@ -71,7 +71,7 @@ public class AdminSettings extends BaseData<AdminSettingsId> implements HasTenan
         this.tenantId = tenantId;
     }
 
-    @ApiModelProperty(position = 4, value = "The Administration Settings key, (e.g. 'general' or 'mail')", example = "mail")
+    @ApiModelProperty(position = 4, value = "管理设置键, (例如 'general' 或者 'mail')", example = "mail")
     public String getKey() {
         return key;
     }
@@ -80,7 +80,7 @@ public class AdminSettings extends BaseData<AdminSettingsId> implements HasTenan
         this.key = key;
     }
 
-    @ApiModelProperty(position = 5, value = "JSON representation of the Administration Settings value")
+    @ApiModelProperty(position = 5, value = "Administration Settings值的JSON表示")
     public JsonNode getJsonValue() {
         return jsonValue;
     }
