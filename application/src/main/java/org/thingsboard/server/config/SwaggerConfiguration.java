@@ -25,11 +25,10 @@ import org.thingsboard.server.common.data.StringUtils;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.queue.util.TbCoreComponent;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.schema.ModelRef;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -87,9 +86,9 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                 .paths(regex(apiPathRegex))
                 .build()
+                .globalOperationParameters(globalRequestParameters())
                 .ignoredParameterTypes(HttpServletResponse.class, HttpServletRequest.class)
                 .securityContexts(securityContexts())
-
                 ;
     }
 
@@ -129,6 +128,19 @@ public class SwaggerConfiguration {
                 .licenseUrl(licenseUrl)
                 .version(apiVersion)
                 .build();
+    }
+
+    private List<Parameter> globalRequestParameters() {
+        ParameterBuilder parameterBuilder = new ParameterBuilder()
+                //每次请求加载header
+                .parameterType("header")
+                //头标签
+                .name("X-Authorization")
+                .description("登录token")
+                .modelRef(new ModelRef("string"))
+                .required(false)
+                ;
+        return Collections.singletonList(parameterBuilder.build());
     }
 
 //    @Bean
