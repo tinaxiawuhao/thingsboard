@@ -17,6 +17,7 @@ package org.thingsboard.server.actors;
 
 import lombok.Data;
 
+//DefaultActorService设置参数
 @Data
 public class TbActorSystemSettings {
 

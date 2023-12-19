@@ -19,10 +19,13 @@ import org.thingsboard.server.common.msg.TbActorMsg;
 
 public interface TbActorRef {
 
+    //获取标识
     TbActorId getActorId();
 
+    //告知消息 TbActorMsg
     void tell(TbActorMsg actorMsg);
 
+    //使用高优先级告知消息
     void tellWithHighPriority(TbActorMsg actorMsg);
 
 }

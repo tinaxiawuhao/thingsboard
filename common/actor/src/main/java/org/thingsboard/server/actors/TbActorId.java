@@ -17,13 +17,14 @@ package org.thingsboard.server.actors;
 
 import org.thingsboard.server.common.data.EntityType;
 
+//Actor标识接口
 public interface TbActorId {
 
     /**
      * Returns entity type of the actor.
      * May return null if the actor does not belong to any entity.
      * This method is added for performance optimization.
-     *
+     * 获取实体类型
      */
     EntityType getEntityType();
 

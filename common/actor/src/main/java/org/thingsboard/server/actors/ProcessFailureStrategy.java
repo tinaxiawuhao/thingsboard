@@ -18,6 +18,7 @@ package org.thingsboard.server.actors;
 import lombok.Getter;
 import lombok.ToString;
 
+//处理消息失败策略
 @ToString
 public class ProcessFailureStrategy {
 

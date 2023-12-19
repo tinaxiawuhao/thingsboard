@@ -87,47 +87,67 @@ public class DefaultTbActorSystem implements TbActorSystem {
         return createActor(dispatcherId, creator, parent);
     }
 
+    /**
+     * 创建 Actor，关键方法
+     */
     private TbActorRef createActor(String dispatcherId, TbActorCreator creator, TbActorId parent) {
+        //获取调度器
         Dispatcher dispatcher = dispatchers.get(dispatcherId);
         if (dispatcher == null) {
             log.warn("Dispatcher with id [{}] is not registered!", dispatcherId);
             throw new RuntimeException("Dispatcher with id [" + dispatcherId + "] is not registered!");
         }
 
+        //获取标识
         TbActorId actorId = creator.createActorId();
+        //获取邮箱
         TbActorMailbox actorMailbox = actors.get(actorId);
         if (actorMailbox != null) {
             log.debug("Actor with id [{}] is already registered!", actorId);
         } else {
+            //创建邮箱
+            //获取 Actor 创建锁
             Lock actorCreationLock = actorCreationLocks.computeIfAbsent(actorId, id -> new ReentrantLock());
+            //加锁
             actorCreationLock.lock();
             try {
+                //获取邮箱
                 actorMailbox = actors.get(actorId);
+                //二次验证
                 if (actorMailbox == null) {
                     log.debug("Creating actor with id [{}]!", actorId);
+                    //创建 Actor
                     TbActor actor = creator.createActor();
                     TbActorRef parentRef = null;
                     if (parent != null) {
+                        //获取父 Actor
                         parentRef = getActor(parent);
                         if (parentRef == null) {
                             throw new TbActorNotRegisteredException(parent, "Parent Actor with id [" + parent + "] is not registered!");
                         }
                     }
+                    //创建邮箱
                     TbActorMailbox mailbox = new TbActorMailbox(this, settings, actorId, parentRef, actor, dispatcher);
+                    //将邮箱放入集合
                     actors.put(actorId, mailbox);
+                    //初始化 Actor
                     mailbox.initActor();
                     actorMailbox = mailbox;
                     if (parent != null) {
+                        //将标识加入对应的父子集合
                         parentChildMap.computeIfAbsent(parent, id -> ConcurrentHashMap.newKeySet()).add(actorId);
                     }
                 } else {
                     log.debug("Actor with id [{}] is already registered!", actorId);
                 }
             } finally {
+                //解锁
                 actorCreationLock.unlock();
+                //移除锁
                 actorCreationLocks.remove(actorId);
             }
         }
+        //返回邮箱
         return actorMailbox;
     }
 
@@ -141,14 +161,20 @@ public class DefaultTbActorSystem implements TbActorSystem {
         tell(target, actorMsg, false);
     }
 
+    /**
+     * 告知 Actor 消息，关键方法
+     */
     private void tell(TbActorId target, TbActorMsg actorMsg, boolean highPriority) {
+        //获取邮箱
         TbActorMailbox mailbox = actors.get(target);
         if (mailbox == null) {
             throw new TbActorNotRegisteredException(target, "Actor with id [" + target + "] is not registered!");
         }
         if (highPriority) {
+            //使用高优先级告知消息
             mailbox.tellWithHighPriority(actorMsg);
         } else {
+            //告知消息
             mailbox.tell(actorMsg);
         }
     }

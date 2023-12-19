@@ -19,6 +19,7 @@ import lombok.Data;
 
 import java.util.concurrent.ExecutorService;
 
+//中间调度器
 @Data
 class Dispatcher {
 

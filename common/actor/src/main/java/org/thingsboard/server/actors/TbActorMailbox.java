@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016-2023 The Thingsboard Authors
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,23 +57,36 @@ public final class TbActorMailbox implements TbActorCtx {
     private final AtomicBoolean destroyInProgress = new AtomicBoolean();
     private volatile TbActorStopReason stopReason;
 
+    /**
+     * 初始化 Actor
+     */
     public void initActor() {
+        //异步初始化
         dispatcher.getExecutor().execute(() -> tryInit(1));
     }
 
+    /**
+     * 尝试初始化 Actor，关键方法
+     */
     private void tryInit(int attempt) {
         try {
             log.debug("[{}] Trying to init actor, attempt: {}", selfId, attempt);
+            //判断销毁状态
             if (!destroyInProgress.get()) {
+                //初始化	Actor
                 actor.init(this);
                 if (!destroyInProgress.get()) {
+                    //设置状态
                     ready.set(READY);
+                    //尝试处理队列消息
                     tryProcessQueue(false);
                 }
             }
         } catch (Throwable t) {
             InitFailureStrategy strategy;
+            //尝试计数加一
             int attemptIdx = attempt + 1;
+            //获取初始化失败策略
             if (isUnrecoverable(t)) {
                 strategy = InitFailureStrategy.stop();
             } else {
@@ -81,16 +94,21 @@ public final class TbActorMailbox implements TbActorCtx {
                 strategy = actor.onInitFailure(attempt, t);
             }
             if (strategy.isStop() || (settings.getMaxActorInitAttempts() > 0 && attemptIdx > settings.getMaxActorInitAttempts())) {
+                //失败策略为停止或尝试次数已超过最大次数
                 log.info("[{}] Failed to init actor, attempt {}, going to stop attempts.", selfId, attempt, t);
+                //记录停止原因为初始化失败
                 stopReason = TbActorStopReason.INIT_FAILED;
+                //销毁
                 destroy(t.getCause());
             } else if (strategy.getRetryDelay() > 0) {
                 log.info("[{}] Failed to init actor, attempt {}, going to retry in attempts in {}ms", selfId, attempt, strategy.getRetryDelay());
                 log.debug("[{}] Error", selfId, t);
+                //设置给定的延时后重新尝试初始化
                 system.getScheduler().schedule(() -> dispatcher.getExecutor().execute(() -> tryInit(attemptIdx)), strategy.getRetryDelay(), TimeUnit.MILLISECONDS);
             } else {
                 log.info("[{}] Failed to init actor, attempt {}, going to retry immediately", selfId, attempt);
                 log.debug("[{}] Error", selfId, t);
+                //立即重新尝试初始化
                 dispatcher.getExecutor().execute(() -> tryInit(attemptIdx));
             }
         }
@@ -103,26 +121,42 @@ public final class TbActorMailbox implements TbActorCtx {
         return t instanceof TbActorError && ((TbActorError) t).isUnrecoverable();
     }
 
+    /**
+     * 消息入队，关键方法
+     */
     private void enqueue(TbActorMsg msg, boolean highPriority) {
+        //判断销毁状态
         if (!destroyInProgress.get()) {
             if (highPriority) {
+                //将消息放入高优先级队列
                 highPriorityMsgs.add(msg);
             } else {
+                //将消息放入普通优先级队列
                 normalPriorityMsgs.add(msg);
             }
+            //尝试处理队列消息
             tryProcessQueue(true);
         } else {
+            //处于销毁状态
             if (highPriority && msg.getMsgType().equals(MsgType.RULE_NODE_UPDATED_MSG)) {
+                //当前为高优先级的规则节点更新消息
+                //加锁
                 synchronized (this) {
                     if (stopReason == TbActorStopReason.INIT_FAILED) {
+                        //当前停止原因为初始化失败
+                        //更改销毁状态
                         destroyInProgress.set(false);
+                        //重置停止原因
                         stopReason = null;
+                        //再次初始化 Actor
                         initActor();
                     } else {
+                        //回调 Actor停止原因
                         msg.onTbActorStopped(stopReason);
                     }
                 }
             } else {
+                //回调 Actor停止原因
                 msg.onTbActorStopped(stopReason);
             }
         }
@@ -130,10 +164,15 @@ public final class TbActorMailbox implements TbActorCtx {
 
     private void tryProcessQueue(boolean newMsg) {
         if (ready.get() == READY) {
+            //已初始化完成
             if (newMsg || !highPriorityMsgs.isEmpty() || !normalPriorityMsgs.isEmpty()) {
+                //当前有新的消息或消息队列不为空（有待处理的消息）
+                //判断当前状态是否为空闲，并改为繁忙
                 if (busy.compareAndSet(FREE, BUSY)) {
+                    //异步处理邮箱
                     dispatcher.getExecutor().execute(this::processMailbox);
                 } else {
+                    //当前状态为繁忙
                     log.trace("[{}] MessageBox is busy, new msg: {}", selfId, newMsg);
                 }
             } else {
@@ -145,35 +184,48 @@ public final class TbActorMailbox implements TbActorCtx {
     }
 
     private void processMailbox() {
+        //标记是否有更多的消息
         boolean noMoreElements = false;
+        //根据指定的吞吐量遍历处理
         for (int i = 0; i < settings.getActorThroughput(); i++) {
+            //从高优先级队列获取消息
             TbActorMsg msg = highPriorityMsgs.poll();
             if (msg == null) {
+                //从普通优先级队列获取消息
                 msg = normalPriorityMsgs.poll();
             }
             if (msg != null) {
                 try {
                     log.debug("[{}] Going to process message: {}", selfId, msg);
+                    //调用 Actor 处理消息
                     actor.process(msg);
                 } catch (TbRuleNodeUpdateException updateException) {
+                    //规则节点更新异常视为初始化失败
                     stopReason = TbActorStopReason.INIT_FAILED;
+                    //销毁
                     destroy(updateException.getCause());
                 } catch (Throwable t) {
                     log.debug("[{}] Failed to process message: {}", selfId, msg, t);
+                    //获取处理失败策略
                     ProcessFailureStrategy strategy = actor.onProcessFailure(t);
                     if (strategy.isStop()) {
+                        //停止 Actor
                         system.stop(selfId);
                     }
                 }
             } else {
+                //没有未处理消息
                 noMoreElements = true;
                 break;
             }
         }
         if (noMoreElements) {
+            //设置空闲状态
             busy.set(FREE);
+            //尝试处理队列消息（再次检查）
             dispatcher.getExecutor().execute(() -> tryProcessQueue(false));
         } else {
+            //继续处理邮箱
             dispatcher.getExecutor().execute(this::processMailbox);
         }
     }
